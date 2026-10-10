@@ -1,0 +1,397 @@
+/* ==========================================================================
+   DEVTOOLS — CENTRAL STYLE FILE
+   Change the look of the WHOLE app from this one file.
+
+   1. FONTS      → swap the two @import lines (npm package: @fontsource-variable/<name>)
+                   and update --font-sans / --font-mono. Fonts are self-hosted: fast + no Google requests.
+   2. COLOURS    → edit --color-brand-* (accent) and --color-slate-* (neutrals)
+   3. SHAPE      → edit --radius-* and --shadow-*
+   4. LAYOUT     → edit --container-max and the breakpoints
+   Everything in the UI uses these tokens, so nothing else needs touching.
+   ========================================================================== */
+
+/* 1. FONT SOURCE — to change fonts: `npm i @fontsource-variable/inter`, import it here, update --font-sans below */
+@import "@fontsource-variable/manrope/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+@import "tailwindcss";
+
+@theme {
+  /* ---- Fonts ---------------------------------------------------------- */
+  --font-sans: "Manrope Variable", "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- Brand / accent colour (currently indigo) ----------------------- */
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-300: #a5b4fc;
+  --color-brand-400: #818cf8;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+  --color-brand-950: #1e1b4b;
+
+  /* ---- Neutral colours: text, borders, backgrounds (currently slate) --- */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* ---- Page-level colours -------------------------------------------- */
+  --color-page: #ffffff;        /* page background  → bg-page  */
+  --color-surface: #ffffff;     /* cards & editors  → bg-surface */
+
+  /* ---- Shape ---------------------------------------------------------- */
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-lift: 0 14px 30px -16px color-mix(in srgb, var(--color-brand-600) 30%, transparent);
+
+  /* ---- Breakpoints (mobile-first) ------------------------------------- */
+  /* default Tailwind: sm 640 · md 768 · lg 1024 · xl 1280 · 2xl 1536 */
+  --breakpoint-xs: 30rem;   /* large phones  (480px) */
+  --breakpoint-3xl: 100rem; /* big monitors (1600px) */
+}
+
+/* ==========================================================================
+   Global layout tokens (plain CSS variables — change freely)
+   ========================================================================== */
+:root {
+  --container-max: 80rem;          /* max content width (1280px) */
+  --gutter: clamp(1rem, 4vw, 2rem); /* side padding: 16px on phones → 32px on desktop */
+  --header-height: 4rem;
+}
+
+/* ==========================================================================
+   Base / reset — responsive & device-safe
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%; /* stop iOS inflating text in landscape */
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-height) + 1rem); /* anchors clear sticky header */
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--color-page);
+  color: var(--color-slate-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden; /* never allow sideways scroll on phones */
+  /* iPhone notch / home-indicator safe areas */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* 16px minimum on inputs stops iOS Safari auto-zooming when focused */
+input,
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+.container-page {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.bg-hero {
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--color-brand-50) 80%, transparent), transparent 25%),
+    radial-gradient(circle at 84% 68%, color-mix(in srgb, var(--color-brand-50) 90%, transparent), transparent 24%),
+    linear-gradient(180deg, var(--color-page) 0%, var(--color-slate-50) 100%);
+}
+
+/* ==========================================================================
+   Typography — fluid, scales smoothly from 320px phones to 4K
+   ========================================================================== */
+.heading-hero {
+  color: var(--color-slate-950);
+  font-size: clamp(2.125rem, 6vw + 0.5rem, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.heading-page {
+  color: var(--color-slate-950);
+  font-size: clamp(1.75rem, 3.5vw + 0.5rem, 2.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.section-kicker {
+  display: block;
+  color: var(--color-brand-600);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  margin-top: 0.625rem;
+  color: var(--color-slate-900);
+  font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.section-copy {
+  margin-top: 0.75rem;
+  color: var(--color-slate-500);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.8);
+  padding: 0.375rem 0.75rem;
+  color: var(--color-slate-600);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+.nav-link {
+  border-radius: var(--radius-control);
+  padding: 0.625rem 1rem;
+  color: var(--color-slate-600);
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: 160ms ease;
+}
+.nav-link:hover,
+.nav-link[aria-current="page"] {
+  background: var(--color-slate-50);
+  color: var(--color-brand-600);
+}
+
+.mobile-link {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem; /* 44px touch target */
+  border-radius: var(--radius-control);
+  padding: 0.75rem;
+  text-align: left;
+  color: var(--color-slate-700);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+.mobile-link:hover {
+  background: var(--color-slate-50);
+}
+
+.icon-box,
+.icon-box-sm,
+.icon-box-lg {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--color-brand-100);
+  background: var(--color-brand-50);
+  color: var(--color-brand-600);
+  transition: 160ms ease;
+}
+.icon-box { width: 2.75rem; height: 2.75rem; margin-bottom: 1.25rem; border-radius: var(--radius-control); }
+.icon-box-sm { width: 2.5rem; height: 2.5rem; border-radius: 0.625rem; }
+.icon-box-lg { width: 3rem; height: 3rem; border-radius: 0.875rem; }
+@media (min-width: 640px) {
+  .icon-box-lg { width: 3.5rem; height: 3.5rem; border-radius: var(--radius-card); }
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+  transition: 180ms ease;
+}
+@media (min-width: 640px) {
+  .tool-card { min-height: 15.5rem; padding: 1.5rem; }
+}
+.tool-card .icon-box { margin-bottom: 1rem; }
+.tool-card:hover {
+  border-color: var(--color-brand-300);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-2px);
+}
+.tool-card:hover .icon-box {
+  background: var(--color-brand-600);
+  color: white;
+}
+/* hover effects only on devices that can hover (no sticky hover on touch) */
+@media (hover: none) {
+  .tool-card:hover { transform: none; box-shadow: var(--shadow-card); border-color: var(--color-slate-200); }
+  .tool-card:hover .icon-box { background: var(--color-brand-50); color: var(--color-brand-600); }
+}
+
+.popular-card {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  gap: 0.875rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.875rem;
+  background: var(--color-surface);
+  padding: 0.875rem;
+  box-shadow: var(--shadow-card);
+  transition: 160ms ease;
+}
+.popular-card:hover {
+  border-color: var(--color-brand-300);
+  box-shadow: var(--shadow-lift);
+}
+
+.feature-card {
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1.5rem;
+}
+@media (min-width: 640px) { .feature-card { padding: 1.75rem; } }
+.feature-card .icon-box { margin-bottom: 0; }
+
+.info-panel {
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+.content-card {
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  padding: 1.5rem;
+}
+.content-card h3 { margin-top: 1rem; color: var(--color-slate-900); font-size: 1rem; font-weight: 800; }
+.content-card p { margin-top: 0.5rem; color: var(--color-slate-500); font-size: 0.875rem; line-height: 1.6; }
+
+.prose-section p {
+  margin-top: 1rem;
+  color: var(--color-slate-600);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+
+.step-number {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-brand-50);
+  color: var(--color-brand-600);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.badge {
+  border: 1px solid #d1fae5;
+  border-radius: 9999px;
+  background: #ecfdf5;
+  padding: 0.25rem 0.625rem;
+  color: #059669;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Code / editor text */
+.code-area {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.75;
+  tab-size: 2;
+}
+
+/* Diff highlight rows (used by JSON Diff later) */
+.diff-changed { margin-inline: -0.5rem; border-radius: 0.375rem; background: #fffbeb; padding-inline: 0.5rem; color: #92400e; }
+.diff-added   { margin-inline: -0.5rem; border-radius: 0.375rem; background: #ecfdf5; padding-inline: 0.5rem; color: #047857; }
+.diff-removed { margin-inline: -0.5rem; border-radius: 0.375rem; background: #fff1f2; padding-inline: 0.5rem; color: #be123c; }
+
+/* Ad slot never causes layout shift */
+.ad-slot { contain: layout; }
