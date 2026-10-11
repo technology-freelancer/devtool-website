@@ -9,6 +9,7 @@ The build output (`dist/`) is plain static files. Any static host works. Cloudfl
    - `VITE_OPERATOR_NAME=Your Name or Company`
 2. Run `npm run build`. The build prints a warning while these are unset.
 3. Read `/privacy` and `/terms` in the built site. They are templates; have them reviewed for your situation and country.
+4. `public/sitemap.xml` and `public/robots.txt` are copied to the site root. When adding a public, indexable route, add its canonical URL to the sitemap; do not add 404 or query-string URLs.
 
 ## 2. Deploy (Cloudflare Pages)
 1. Push the project to a GitHub repository.

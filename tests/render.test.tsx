@@ -15,6 +15,7 @@ import TimestampConverter from "../src/tools/timestamp-converter/TimestampConver
 import JsonDiff from "../src/tools/json-diff/JsonDiff"
 import { tools } from "../src/tools/registry"
 import { toolComponents } from "../src/tools/components"
+import { canonicalUrl } from "../src/lib/seo"
 
 const components = { JsonToJava, JsonToTypeScript, JwtDecoder, CronGenerator, SqlFormatter, RegexTester, ApiResponseFormatter, UuidGenerator, Base64Converter, TimestampConverter, JsonDiff }
 
@@ -30,6 +31,8 @@ describe("tool workspaces render without errors", () => {
 describe("registry and pre-render", () => {
   it("every tool has a component, SEO text and unique slug", () => {
     expect(new Set(tools.map((t) => t.slug)).size).toBe(tools.length)
+    expect(new Set(tools.map((t) => t.seoTitle)).size).toBe(tools.length)
+    expect(new Set(tools.map((t) => t.seoDescription)).size).toBe(tools.length)
     for (const t of tools) {
       expect(toolComponents[t.slug], t.slug).toBeDefined()
       expect(`${t.seoTitle} | DevTools`.length).toBeLessThanOrEqual(64)
@@ -45,6 +48,7 @@ describe("registry and pre-render", () => {
       expect(head, url).toContain("<title>")
       expect(head, url).toContain('name="description"')
       expect(head, url).toContain('rel="canonical"')
+      expect(head, url).toContain(`href="${canonicalUrl(url)}"`)
       expect(html, url).not.toContain("<title>")
     }
   })
