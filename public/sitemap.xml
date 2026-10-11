@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://devtools-co.vercel.app/</loc></url>
-  <url><loc>https://devtools-co.vercel.app/json-to-java</loc></url>
-  <url><loc>https://devtools-co.vercel.app/json-to-typescript</loc></url>
-  <url><loc>https://devtools-co.vercel.app/jwt-decoder</loc></url>
-  <url><loc>https://devtools-co.vercel.app/cron-generator</loc></url>
-  <url><loc>https://devtools-co.vercel.app/sql-formatter</loc></url>
-  <url><loc>https://devtools-co.vercel.app/regex-tester</loc></url>
-  <url><loc>https://devtools-co.vercel.app/api-response-formatter</loc></url>
-  <url><loc>https://devtools-co.vercel.app/uuid-generator</loc></url>
-  <url><loc>https://devtools-co.vercel.app/base64-converter</loc></url>
-  <url><loc>https://devtools-co.vercel.app/timestamp-converter</loc></url>
-  <url><loc>https://devtools-co.vercel.app/json-diff</loc></url>
-  <url><loc>https://devtools-co.vercel.app/privacy</loc></url>
-  <url><loc>https://devtools-co.vercel.app/terms</loc></url>
-  <url><loc>https://devtools-co.vercel.app/contact</loc></url>
+  <url><loc>https://devtools-com.vercel.app/</loc></url>
+  <url><loc>https://devtools-com.vercel.app/json-to-java</loc></url>
+  <url><loc>https://devtools-com.vercel.app/json-to-typescript</loc></url>
+  <url><loc>https://devtools-com.vercel.app/jwt-decoder</loc></url>
+  <url><loc>https://devtools-com.vercel.app/cron-generator</loc></url>
+  <url><loc>https://devtools-com.vercel.app/sql-formatter</loc></url>
+  <url><loc>https://devtools-com.vercel.app/regex-tester</loc></url>
+  <url><loc>https://devtools-com.vercel.app/api-response-formatter</loc></url>
+  <url><loc>https://devtools-com.vercel.app/uuid-generator</loc></url>
+  <url><loc>https://devtools-com.vercel.app/base64-converter</loc></url>
+  <url><loc>https://devtools-com.vercel.app/timestamp-converter</loc></url>
+  <url><loc>https://devtools-com.vercel.app/json-diff</loc></url>
+  <url><loc>https://devtools-com.vercel.app/privacy</loc></url>
+  <url><loc>https://devtools-com.vercel.app/terms</loc></url>
+  <url><loc>https://devtools-com.vercel.app/contact</loc></url>
 </urlset>

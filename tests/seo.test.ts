@@ -4,7 +4,7 @@ import { JSDOM } from "jsdom"
 import { describe, expect, it } from "vitest"
 import { routes } from "../src/app/routes"
 
-const baseUrl = "https://devtools-co.vercel.app"
+const baseUrl = "https://devtools-com.vercel.app"
 const sitemap = readFileSync(resolve(process.cwd(), "public/sitemap.xml"), "utf8")
 const robots = readFileSync(resolve(process.cwd(), "public/robots.txt"), "utf8")
 
