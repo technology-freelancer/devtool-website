@@ -1,14 +1,10 @@
 import { Link } from "react-router-dom"
 import { openConsentSettings } from "@/lib/consent"
+import { SITE } from "@/config/site"
+import { getTool, popularSlugs } from "@/tools/registry"
 import Logo from "./Logo"
 
-const links = [
-  { label: "Tools", to: "/#tools" },
-  { label: "About", to: "/#about" },
-  { label: "Privacy", to: "/privacy" },
-  { label: "Terms", to: "/terms" },
-  { label: "Contact", to: "/contact" },
-]
+const popularTools = popularSlugs.map(getTool).filter((tool) => tool !== undefined)
 
 const socials = [
   { label: "GitHub", href: "https://github.com/devtools-com", icon: "github" },
@@ -21,7 +17,7 @@ const socials = [
   // { label: "YouTube", href: "https://www.youtube.com/", icon: "youtube" },
 ] as const
 
-function SocialIcon({ name }: { name: (typeof socials)[number]["icon"] }) {
+function SocialIcon({ name }: { name: "github" | "linkedin" | "instagram" | "mdn" | "medium" | "reddit" | "x" | "youtube" }) {
   const common = { fill: "currentColor", height: 20, viewBox: "0 0 24 24", width: 20, "aria-hidden": true as const }
   switch (name) {
     case "github":
@@ -46,40 +42,69 @@ function SocialIcon({ name }: { name: (typeof socials)[number]["icon"] }) {
 export default function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-slate-50" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div className="container-page py-10">
-        <div className="flex flex-col justify-between gap-8 md:flex-row md:items-center">
-          <div>
+      <div className="container-page py-10 sm:py-12">
+        <div className="grid gap-9 border-b border-slate-200 pb-9 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10 lg:pb-10">
+          <div className="max-w-sm">
             <Logo />
-            <p className="mt-3 text-sm text-slate-500">Simple tools for developers.</p>
+            <p className="mt-3 text-sm leading-6 text-slate-500">Free, focused tools for everyday development. Work quickly, keep control of your data, and get back to building.</p>
+            <p className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+              Browser-based · No account required
+            </p>
           </div>
-          <nav className="flex flex-wrap gap-x-7 gap-y-1 text-sm font-semibold text-slate-600" aria-label="Footer">
-            {links.map((l) => (
-              <Link key={l.label} to={l.to} className="inline-flex min-h-11 items-center hover:text-brand-600">
-                {l.label}
-              </Link>
-            ))}
-            <button type="button" onClick={openConsentSettings} className="inline-flex min-h-11 items-center hover:text-brand-600">
-              Cookie settings
-            </button>
+          <nav aria-label="Popular tools">
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Popular tools</h2>
+            <ul className="mt-3 space-y-1">
+              {popularTools.map((tool) => (
+                <li key={tool.slug}><Link to={`/${tool.slug}`} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">{tool.shortName || tool.name}</Link></li>
+              ))}
+              <li><Link to="/#tools" className="inline-flex min-h-9 items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">Browse all tools <span aria-hidden="true">→</span></Link></li>
+            </ul>
+          </nav>
+          <nav aria-label="Resources and company">
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Resources</h2>
+            <ul className="mt-3 space-y-1">
+              <li><a href="https://devtoolscom.medium.com/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Guides and articles</a></li>
+              <li><a href="https://github.com/devtools-com" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">GitHub community</a></li>
+              <li><a href="https://developer.mozilla.org/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">MDN Web Docs</a></li>
+              <li><a href="https://www.linkedin.com/company/devtools-co/" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">LinkedIn</a></li>
+            </ul>
+          </nav>
+          <nav aria-label="Company and legal">
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Company & legal</h2>
+            <ul className="mt-3 space-y-1">
+              <li><Link to="/#about" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">About DevTools</Link></li>
+              <li><Link to="/contact" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Contact</Link></li>
+              <li><Link to="/privacy" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Privacy policy</Link></li>
+              <li><Link to="/terms" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Terms of use</Link></li>
+              <li><button type="button" onClick={openConsentSettings} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Cookie settings</button></li>
+            </ul>
           </nav>
         </div>
-        <div className="mt-6 flex flex-wrap items-center gap-3" aria-label="Social media and developer resources">
-          {socials.map((social) => (
-            <a
-              key={social.label}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.label}
-              title={social.label}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
-            >
-              <SocialIcon name={social.icon} />
-            </a>
-          ))}
+        <div className="flex flex-col gap-5 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-bold text-slate-600">Follow DevTools</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Social media">
+              {socials.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  title={social.label}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                >
+                  <SocialIcon name={social.icon} />
+                </a>
+              ))}
+            </div>
+          </div>
+          <a href={`mailto:${SITE.email}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-slate-600 hover:text-brand-600">{SITE.email}</a>
         </div>
-        <div className="mt-8 border-t border-slate-200 pt-6 text-xs text-slate-400">
+        <div className="mt-6 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           © {new Date().getFullYear()} DevTools. Built for developers everywhere.
+          <span>Free browser-based developer utilities.</span>
         </div>
       </div>
     </footer>
