@@ -32,15 +32,15 @@ describe("registry and pre-render", () => {
     expect(new Set(tools.map((t) => t.slug)).size).toBe(tools.length)
     for (const t of tools) {
       expect(toolComponents[t.slug], t.slug).toBeDefined()
-      expect(t.seoTitle.length).toBeLessThanOrEqual(75)
-      expect(t.seoDescription.length).toBeLessThanOrEqual(175)
+      expect(`${t.seoTitle} | DevTools`.length).toBeLessThanOrEqual(64)
+      expect(t.seoDescription.length).toBeLessThanOrEqual(155)
       expect(t.steps.length).toBeGreaterThanOrEqual(2)
       expect(t.faqs.length).toBeGreaterThanOrEqual(2)
     }
   })
-  it("pre-renders every route with a title, description and canonical", () => {
+  it("pre-renders every route with a title, description and canonical", async () => {
     for (const url of routes) {
-      const { html, head } = render(url)
+      const { html, head } = await render(url)
       expect(html.length, url).toBeGreaterThan(500)
       expect(head, url).toContain("<title>")
       expect(head, url).toContain('name="description"')
@@ -48,15 +48,24 @@ describe("registry and pre-render", () => {
       expect(html, url).not.toContain("<title>")
     }
   })
-  it("tool pages include structured data and real content", () => {
-    const { html, head } = render("/json-to-java")
+  it("tool pages include structured data and the Learn content in the static HTML", async () => {
+    const { html, head } = await render("/json-to-java")
     expect(head).toContain("application/ld+json")
     expect(head).toContain("FAQPage")
     expect(html.replace(/<!-- -->/g, "")).toContain("How to use JSON to Java")
     expect(html).toContain("snake_case keys")
+    expect(html.replace(/<!-- -->/g, "")).toContain("Last updated: October 2026")
+    expect(html).toContain("What is a JSON to Java converter?")
   })
-  it("unknown URLs render a noindex 404", () => {
-    const { head } = render("/nope")
+  it("every tool page has a Learn section in its static HTML", async () => {
+    for (const t of tools) {
+      const { html } = await render(`/${t.slug}`)
+      expect(html, t.slug).toContain("Further reading")
+      expect(html.replace(/<!-- -->/g, ""), t.slug).toContain("Last updated:")
+    }
+  })
+  it("unknown URLs render a noindex 404", async () => {
+    const { head } = await render("/nope")
     expect(head).toContain("noindex")
   })
 })

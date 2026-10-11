@@ -16,8 +16,8 @@ const assets = existsSync(join(dist, "assets")) ? readdirSync(join(dist, "assets
 const font = assets.find((f) => /^manrope-latin-wght-normal.*\.woff2$/.test(f))
 const preload = font ? `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />\n    ` : ""
 
-function page(url, noindexFallback = false) {
-  const { html, head } = render(url)
+async function page(url, noindexFallback = false) {
+  const { html, head } = await render(url)
   const route = url.length > 1 ? url.replace(/\/+$/, "") : url
   const headBlock = head || (noindexFallback ? '<meta name="robots" content="noindex" />' : "")
   return template
@@ -28,11 +28,11 @@ function page(url, noindexFallback = false) {
 for (const url of routes) {
   const file = url === "/" ? join(dist, "index.html") : join(dist, `${url.slice(1)}.html`)
   mkdirSync(join(file, ".."), { recursive: true })
-  writeFileSync(file, page(url))
+  writeFileSync(file, await page(url))
 }
 
 // Real 404 page (Cloudflare Pages, Netlify and Vercel serve /404.html for unknown URLs)
-writeFileSync(join(dist, "404.html"), page("/page-not-found", true))
+writeFileSync(join(dist, "404.html"), await page("/page-not-found", true))
 
 // sitemap.xml + robots.txt
 const today = new Date().toISOString().slice(0, 10)

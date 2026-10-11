@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom"
+import { Analytics } from "@vercel/analytics/react"
 import ConsentBanner from "@/components/ConsentBanner"
 import Footer from "@/components/Footer"
 import Header from "@/components/Header"
@@ -27,6 +28,7 @@ export default function App() {
       </div>
       <Footer />
       <ConsentBanner />
+      <Analytics />
     </div>
   )
 }

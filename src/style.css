@@ -125,10 +125,10 @@ select {
   font-size: max(16px, 1em);
 }
 
-:focus-visible {
+/* :focus-visible {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
   *,

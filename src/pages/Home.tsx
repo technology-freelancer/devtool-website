@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import AdSlot from "@/components/AdSlot"
-import Button from "@/components/Button"
 import Faq from "@/components/Faq"
 import Icon, { type IconName } from "@/components/Icon"
 import Seo from "@/components/Seo"
@@ -26,7 +24,10 @@ const features: [IconName, string, string][] = [
 
 export default function Home() {
   const [query, setQuery] = useState("")
+  const [category, setCategory] = useState("All")
+  const categories = ["All", ...new Set(tools.map((tool) => tool.category))]
   const filtered = tools.filter((t) =>
+    (category === "All" || t.category === category) &&
     `${t.name} ${t.description} ${t.category}`.toLowerCase().includes(query.toLowerCase()),
   )
   useEffect(() => {
@@ -60,23 +61,29 @@ export default function Home() {
             Format, convert, decode and test your data with simple browser-based developer utilities.
           </p>
 
-          <div className="mx-auto mt-8 flex max-w-2xl items-center gap-3 rounded-2xl border border-slate-200 bg-surface p-1.5 pl-4 shadow-xl shadow-slate-200/50 transition focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-50 sm:mt-9 sm:p-2 sm:pl-5">
-            <span className="text-slate-400"><Icon name="search" size={21} /></span>
+          <div id="search" role="search" className="mx-auto mt-8 flex min-h-14 max-w-2xl items-center gap-2 rounded-2xl border border-slate-200 bg-surface p-1.5 pl-3 shadow-xl shadow-slate-200/50 transition focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-50 sm:mt-9 sm:gap-3 sm:p-2 sm:pl-5">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 sm:h-10 sm:w-10"><Icon name="search" size={19} /></span>
             <input
               id="tool-search"
               type="search"
-              className="min-w-0 flex-1 bg-transparent py-2.5 text-slate-900 outline-none placeholder:text-slate-400"
-              placeholder="Search a developer tool..."
+              className="min-h-11 min-w-0 flex-1 bg-transparent py-2 text-base text-slate-900 outline-none placeholder:text-sm placeholder:text-slate-400 sm:text-sm"
+              placeholder="Search tools..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search developer tools"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" })
+              }}
             />
-            <Button
-              className="hidden sm:inline-flex"
+            <button
+              type="button"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600 text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:flex sm:w-auto sm:gap-2 sm:px-4"
               onClick={() => document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" })}
+              aria-label="Find matching tools"
             >
-              Find tool
-            </Button>
+              <span className="hidden text-sm font-bold sm:inline">Find tool</span>
+              <Icon name="arrow" size={17} />
+            </button>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm">
@@ -101,7 +108,28 @@ export default function Home() {
             <h2 className="section-title">Developer tools</h2>
             <p className="section-copy">Everything you need for everyday development tasks.</p>
           </div>
-          <span className="text-sm font-semibold text-slate-400">{filtered.length} tools</span>
+          <span className="text-sm font-semibold text-slate-400" aria-live="polite">{filtered.length} {filtered.length === 1 ? "tool" : "tools"}</span>
+        </div>
+        <div className="-mx-4 mt-6 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0" role="group" aria-label="Filter tools by category">
+          <div className="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap">
+            {categories.map((item) => {
+              const selected = category === item
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setCategory(item)}
+                  className={`min-h-10 rounded-full border px-4 text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 ${selected
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
         </div>
         {filtered.length ? (
           <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-9 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -110,14 +138,14 @@ export default function Home() {
         ) : (
           <div className="mt-9 rounded-2xl border border-slate-200 px-4 py-16 text-center">
             <p className="font-bold text-slate-800">No tools found</p>
-            <button className="mt-2 min-h-11 text-sm font-bold text-brand-600" onClick={() => setQuery("")}>
-              Clear search
+            <button className="mt-2 min-h-11 text-sm font-bold text-brand-600" onClick={() => { setQuery(""); setCategory("All") }}>
+              Clear filters
             </button>
           </div>
         )}
       </section>
 
-      <section className="container-page pb-12 sm:pb-16"><AdSlot wide /></section>
+      {/* <section className="container-page pb-12 sm:pb-16"><AdSlot wide /></section> */}
 
       <section id="about" className="border-y border-slate-100 bg-slate-50/70">
         <div className="container-page py-12 sm:py-16 lg:py-20">

@@ -3,8 +3,9 @@ import { Link } from "react-router-dom"
 import { SITE } from "@/config/site"
 import { track } from "@/lib/analytics"
 import { canonicalUrl } from "@/lib/seo"
+import { useLearn } from "@/tools/learn"
+import LearnSection from "@/tools/learn/LearnSection"
 import { relatedTools, type Tool } from "@/tools/registry"
-import AdSlot from "./AdSlot"
 import Faq from "./Faq"
 import Icon from "./Icon"
 import Seo from "./Seo"
@@ -31,6 +32,7 @@ function jsonLd(tool: Tool) {
  * the tool workspace (children), ad slot, how-to, features, FAQ and related tools.
  */
 export default function ToolShell({ tool, children }: { tool: Tool; children: ReactNode }) {
+  const learn = useLearn(tool.slug)
   return (
     <main className="bg-slate-50/40">
       <Seo title={`${tool.seoTitle} | ${SITE.name}`} description={tool.seoDescription} path={`/${tool.slug}`} jsonLd={jsonLd(tool)} />
@@ -55,7 +57,7 @@ export default function ToolShell({ tool, children }: { tool: Tool; children: Re
 
       {children}
 
-      <div className="container-page py-6"><AdSlot /></div>
+      {/* <div className="container-page py-6"><AdSlot /></div> */}
 
       <section className="container-narrow py-10 sm:py-14">
         <div className="prose-section">
@@ -85,6 +87,7 @@ export default function ToolShell({ tool, children }: { tool: Tool; children: Re
             ))}
           </div>
         </div>
+        {learn ? <LearnSection data={learn} toolName={tool.name} /> : <div className="mt-14 min-h-[40rem]" aria-hidden="true" />}
         <div className="mt-10 sm:mt-12">
           <h2 className="text-xl font-black text-slate-950 sm:text-2xl">Frequently asked questions</h2>
           <div className="mt-5 divide-y divide-slate-200 border-y border-slate-200">

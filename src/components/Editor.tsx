@@ -24,7 +24,7 @@ export default function Editor({
   const gutter = showGutter ? Array.from({ length: lines }, (_, i) => i + 1).join("\n") : ""
 
   return (
-    <div className="flex min-h-72 flex-col overflow-hidden rounded-(--radius-card) border border-slate-200 bg-surface shadow-(--shadow-card) sm:min-h-[25rem]">
+    <div className="flex h-[24rem] min-h-0 min-w-0 flex-col overflow-hidden rounded-(--radius-card) border border-slate-200 bg-surface shadow-(--shadow-card) sm:h-[28rem] lg:h-[32rem]">
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-slate-200 bg-slate-50 px-4">
         <span className="text-sm font-extrabold text-slate-800">{label}</span>
         <div className="flex items-center gap-2">
@@ -41,14 +41,14 @@ export default function Editor({
           <pre
             ref={gutterRef}
             aria-hidden="true"
-            className="code-area m-0 w-11 shrink-0 select-none overflow-hidden border-r border-slate-100 bg-slate-50/60 py-5 pr-2 text-right text-slate-300"
+            className="code-area m-0 w-9 shrink-0 select-none overflow-hidden border-r border-slate-100 bg-slate-50/60 py-5 pr-2 text-right text-slate-300 sm:w-11"
           >
             {gutter}
           </pre>
         )}
         <textarea
           aria-label={label}
-          className={`code-area min-h-0 flex-1 resize-none p-4 outline-none sm:p-5 ${showGutter ? "py-5" : ""} ${
+          className={`code-area min-h-0 min-w-0 flex-1 resize-none overflow-auto overscroll-contain p-3.5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-300 sm:p-5 ${showGutter ? "py-5" : ""} ${
             readOnly ? "bg-slate-50/40 text-slate-700" : "bg-surface text-slate-800"
           }`}
           value={value}

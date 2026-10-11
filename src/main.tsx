@@ -5,6 +5,7 @@ import App from "./app/App"
 import ErrorBoundary from "./components/ErrorBoundary"
 import { initAnalytics } from "./lib/analytics"
 import { initMonitoring } from "./lib/monitoring"
+import { preloadLearnForPath } from "./tools/learn"
 import "./style.css"
 
 initAnalytics()
@@ -20,12 +21,18 @@ const tree = (
   </StrictMode>
 )
 
-const root = document.getElementById("root")!
-const normalize = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p)
-// Pre-rendered pages carry data-route. Hydrate only when it matches this URL, otherwise render fresh.
-if (root.hasChildNodes() && root.dataset.route === normalize(location.pathname)) {
-  hydrateRoot(root, tree)
-} else {
-  root.innerHTML = ""
-  createRoot(root).render(tree)
+async function start() {
+  const root = document.getElementById("root")!
+  // The Learn text for this page must be loaded before hydrating, so the client renders exactly what the server sent.
+  await preloadLearnForPath(location.pathname).catch(() => undefined)
+  const normalize = (p: string) => (p.length > 1 ? p.replace(/\/+$/, "") : p)
+  // Pre-rendered pages carry data-route. Hydrate only when it matches this URL, otherwise render fresh.
+  if (root.hasChildNodes() && root.dataset.route === normalize(location.pathname)) {
+    hydrateRoot(root, tree)
+  } else {
+    root.innerHTML = ""
+    createRoot(root).render(tree)
+  }
 }
+
+void start()

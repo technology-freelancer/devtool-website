@@ -15,6 +15,7 @@
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/manrope": "^5.3.0",
     "@sentry/react": "^11.6.0",
+    "@vercel/analytics": "^2.0.1",
     "cron-parser": "^5.10.1",
     "cronstrue": "^3.31.0",
     "jsondiffpatch": "^0.7.6",

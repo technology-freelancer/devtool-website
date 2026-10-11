@@ -119,8 +119,8 @@ export default function TextToolWorkspace({
           {options}
         </div>
       )}
-      <div className="grid gap-5 lg:grid-cols-2">
-        <div>
+      <div className="grid min-w-0 gap-5 lg:grid-cols-2 lg:gap-6">
+        <div className="min-w-0">
           <Editor
             label={inputLabel}
             value={input}
@@ -137,7 +137,7 @@ export default function TextToolWorkspace({
             <Button variant="secondary" onClick={clear}>Clear</Button>
           </div>
         </div>
-        <div>
+        <div className="min-w-0">
           <Editor
             label={outputLabel}
             value={output}
