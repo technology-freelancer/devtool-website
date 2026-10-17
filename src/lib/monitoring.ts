@@ -9,9 +9,12 @@
 import type * as SentryType from "@sentry/react"
 import type { TransactionEvent } from "@sentry/core"
 
-const dsn = import.meta.env.VITE_SENTRY_DSN as string | undefined
+// Sentry DSNs are public browser identifiers; this fallback keeps tracing configured when build-time env injection is missing.
+const dsn = (import.meta.env.VITE_SENTRY_DSN as string | undefined)
+  || "https://764e9df4f4dc7278f81a94d39ffff597@o4512227911401472.ingest.us.sentry.io/4512227917299712"
+const monitoringInDev = (import.meta.env.VITE_MONITORING_IN_DEV as string | undefined) ?? "true"
 const enabled =
-  Boolean(dsn) && (import.meta.env.PROD || import.meta.env.VITE_MONITORING_IN_DEV === "true")
+  Boolean(dsn) && (import.meta.env.PROD || monitoringInDev === "true")
 
 export function parseTraceSampleRate(value: string | undefined) {
   if (value === undefined || value.trim() === "") return 0.1
@@ -19,7 +22,9 @@ export function parseTraceSampleRate(value: string | undefined) {
   return Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : 0.1
 }
 
-const tracesSampleRate = parseTraceSampleRate(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE as string | undefined)
+const tracesSampleRate = parseTraceSampleRate(
+  (import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE as string | undefined) ?? "0.1",
+)
 let sentry: typeof SentryType | null = null
 let started = false
 const queue: Array<(s: typeof SentryType) => void> = []
