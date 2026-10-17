@@ -10,6 +10,8 @@ export type Section = { heading: string; blocks: Block[] }
 /** Educational content shown under each tool. Inline syntax in text: `code` and [label](/internal-or-https-link). */
 export type Learn = {
   updated: string
+  /** ISO date used for sitemap and structured data; keep this aligned with updated. */
+  updatedIso: string
   sections: Section[]
   references: { label: string; href: string }[]
   related: { slug: string; anchor: string; why: string }[]

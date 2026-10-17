@@ -15,15 +15,15 @@ const FIELDS = [
   { label: "Weekday", hint: "0-6 (Sun=0)" },
 ]
 
-const PRESETS: [string, string][] = [
-  ["Every minute", "* * * * *"],
-  ["Every 5 minutes", "*/5 * * * *"],
-  ["Hourly", "0 * * * *"],
-  ["Daily at midnight", "0 0 * * *"],
-  ["Daily at 9:00", "0 9 * * *"],
-  ["Weekdays at 9:00", "0 9 * * 1-5"],
-  ["Weekly (Sunday)", "0 0 * * 0"],
-  ["Monthly (1st)", "0 0 1 * *"],
+const PRESETS: [string, string, string][] = [
+  ["Every minute", "* * * * *", "cron.preset.every-minute"],
+  ["Every 5 minutes", "*/5 * * * *", "cron.preset.every-5-minutes"],
+  ["Hourly", "0 * * * *", "cron.preset.hourly"],
+  ["Daily at midnight", "0 0 * * *", "cron.preset.daily-at-midnight"],
+  ["Daily at 9:00", "0 9 * * *", "cron.preset.daily-at-9"],
+  ["Weekdays at 9:00", "0 9 * * 1-5", "cron.preset.weekdays-at-9"],
+  ["Weekly (Sunday)", "0 0 * * 0", "cron.preset.weekly-sunday"],
+  ["Monthly (1st)", "0 0 1 * *", "cron.preset.monthly-1st"],
 ]
 
 export default function CronGenerator() {
@@ -51,15 +51,16 @@ export default function CronGenerator() {
   }
 
   return (
-    <div className="container-page max-w-5xl py-8 sm:py-10">
+    <div className="container-page max-w-5xl py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="rounded-(--radius-card) border border-slate-200 bg-surface p-4 shadow-(--shadow-card) sm:p-8">
         <h2 className="text-lg font-extrabold text-slate-900">Build your expression</h2>
         <p className="mt-1 text-sm text-slate-500">Set each field, use * for every value, or pick a preset.</p>
 
         <div className="mt-5 flex flex-wrap gap-2">
-          {PRESETS.map(([label, expr]) => (
+          {PRESETS.map(([label, expr, trackName]) => (
             <button
               key={label}
+              data-track={trackName}
               type="button"
               onClick={() => setAll(expr)}
               className={`min-h-9 rounded-full border px-3 text-xs font-bold transition ${expression === expr ? "border-brand-300 bg-brand-50 text-brand-700" : "border-slate-200 bg-surface text-slate-600 hover:border-slate-300"}`}
@@ -101,7 +102,7 @@ export default function CronGenerator() {
             <p className="mt-2 text-sm text-slate-300">{result.error ? "Fix the expression to see its meaning." : `${result.text}.`}</p>
           </div>
           <div className="mt-5 sm:mt-0">
-            <Button variant="secondary" onClick={() => { navigator.clipboard?.writeText(expression); analytics.copy() }} icon="copy">Copy expression</Button>
+            <Button data-track="cron.copy" variant="secondary" onClick={() => { navigator.clipboard?.writeText(expression); analytics.copy() }} icon="copy">Copy expression</Button>
           </div>
         </div>
         {result.error && <ErrorNote message={result.error} />}
@@ -113,7 +114,7 @@ export default function CronGenerator() {
             <h2 className="text-base font-extrabold text-slate-900">Next 5 runs</h2>
             <div className="flex items-center gap-1 rounded-xl border border-slate-200 p-1 text-xs font-bold">
               {[false, true].map((u) => (
-                <button key={String(u)} type="button" onClick={() => setUtc(u)} className={`min-h-8 rounded-lg px-3 ${utc === u ? "bg-brand-600 text-white" : "text-slate-600"}`}>
+                <button key={String(u)} data-track="cron.utc-toggle" type="button" onClick={() => setUtc(u)} className={`min-h-8 rounded-lg px-3 ${utc === u ? "bg-brand-600 text-white" : "text-slate-600"}`}>
                   {u ? "UTC" : "Local time"}
                 </button>
               ))}

@@ -19,6 +19,8 @@ const loaders: Record<string, () => Promise<{ default: Learn }>> = {
   "base64-converter": () => import("./content/base64-converter"),
   "timestamp-converter": () => import("./content/timestamp-converter"),
   "json-diff": () => import("./content/json-diff"),
+  "aes-encryption-decryption": () => import("./content/aes-encryption-decryption"),
+  "qr-code-generator": () => import("./content/qr-code-generator"),
 }
 
 export const learnLoaders = loaders

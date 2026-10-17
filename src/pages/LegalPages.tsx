@@ -4,7 +4,7 @@ import Seo from "@/components/Seo"
 import { SITE } from "@/config/site"
 import { openConsentSettings } from "@/lib/consent"
 
-function Legal({ title, path, description, children }: { title: string; path: string; description: string; children: ReactNode }) {
+export function Legal({ title, path, description, children }: { title: string; path: string; description: string; children: ReactNode }) {
   return (
     <main className="container-narrow py-12 sm:py-16" style={{ maxWidth: "48rem" }}>
       <Seo title={`${title} | ${SITE.name}`} description={description} path={path} />
@@ -53,7 +53,7 @@ export function PrivacyPage() {
 
 export function TermsPage() {
   return (
-    <Legal title="Terms of Use" path="/terms" description={`The terms for using ${SITE.name}, a set of free online developer tools.`}>
+    <Legal title="Terms of Use" path="/terms" description={`The terms for using ${SITE.name}: acceptable use, warranties, liability and your content.`}>
       <p>By using {SITE.name} you agree to these terms. If you do not agree, please do not use the site.</p>
 
       <h2>Use of the tools</h2>
@@ -79,10 +79,40 @@ export function TermsPage() {
 
 export function ContactPage() {
   return (
-    <Legal title="Contact" path="/contact" description={`Contact ${SITE.name}: report a bug, suggest a tool or ask a question.`}>
+    <Legal title="Contact" path="/contact" description={`Contact ${SITE.name} to report a bug, suggest a tool or ask a question about privacy. We read every message.`}>
       <p>We read every message. Email us to report a bug, suggest a new tool or ask a question about privacy.</p>
       <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
       <p>When reporting a bug, please tell us the tool, your browser and device, and what you expected to happen. Please do not send secrets, tokens or private data.</p>
+    </Legal>
+  )
+}
+
+export function AboutPage() {
+  const libraries: [string, string][] = [
+    ["sql-formatter", "https://github.com/sql-formatter-org/sql-formatter"],
+    ["cronstrue", "https://github.com/bradymholt/cRonstrue"],
+    ["cron-parser", "https://github.com/harrisiirak/cron-parser"],
+    ["uuid", "https://github.com/uuidjs/uuid"],
+    ["jsondiffpatch", "https://github.com/benjamine/jsondiffpatch"],
+    ["node-qrcode", "https://github.com/soldair/node-qrcode"],
+  ]
+  return (
+    <Legal title="About DevTools" path="/about" description={`${SITE.name} is a collection of free developer tools that run in your browser. Learn how the tools work and how your data is handled.`}>
+      <p>{SITE.name} is a collection of free online tools for developers: converters, formatters, decoders and generators for everyday work. It is operated by {SITE.operator}.</p>
+      <h2>What we aim for</h2>
+      <ul>
+        <li><strong>Private by design.</strong> Tool input is processed locally in your browser and is not sent to our servers or analytics. See our <Link to="/privacy">privacy policy</Link>.</li>
+        <li><strong>Free and simple.</strong> No account or installation is needed to use the tools.</li>
+        <li><strong>Useful explanations.</strong> Tool pages include examples and guidance to help explain results.</li>
+        <li><strong>Tested.</strong> Automated tests help verify tool output and keep documentation examples accurate.</li>
+      </ul>
+      <h2>How the tools are built</h2>
+      <p>Tools use browser features such as JavaScript regular expressions and the Web Crypto API, along with open-source projects including:</p>
+      <ul>{libraries.map(([name, href]) => <li key={name}><a href={href} rel="noopener noreferrer">{name}</a></li>)}</ul>
+      <h2>Find a tool</h2>
+      <p>Browse the <Link to="/tools">full list of tools</Link>, grouped by what they do.</p>
+      <h2>Found a mistake?</h2>
+      <p>If you find a bug or have a suggestion, please <Link to="/contact">contact us</Link>. Review results before relying on them, as explained in the <Link to="/terms">terms of use</Link>.</p>
     </Legal>
   )
 }

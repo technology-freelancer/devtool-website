@@ -2,6 +2,7 @@ import type { Learn } from "../types"
 
 const learn: Learn = {
   updated: "October 2026",
+  updatedIso: "2026-10-15",
   sections: [
     {
       heading: "What is a UUID?",

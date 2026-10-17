@@ -5,6 +5,7 @@ import Icon, { type IconName } from "@/components/Icon"
 import Seo from "@/components/Seo"
 import ToolCard from "@/components/ToolCard"
 import { SITE } from "@/config/site"
+import { organizationLd, websiteLd } from "@/lib/schema"
 import { track } from "@/lib/analytics"
 import { getTool, popularSlugs, tools } from "@/tools/registry"
 
@@ -34,7 +35,7 @@ export default function Home() {
     const q = query.trim().toLowerCase()
     if (q.length < 2) return
     const t = setTimeout(
-      () => track("search_used", { query: q.slice(0, 30), query_length: q.length, result_count: filtered.length }),
+      () => track("search_used", { query_length: q.length, result_count: filtered.length }),
       800,
     )
     return () => clearTimeout(t)
@@ -42,12 +43,12 @@ export default function Home() {
   const popular = popularSlugs.map(getTool).filter((t) => t !== undefined)
 
   return (
-    <>
+    <main data-track-area="main">
       <Seo
         title={`${SITE.name} - Free Online Developer Tools`}
         description="Free browser-based developer tools: convert JSON to Java or TypeScript, decode JWTs, format SQL, test regex and more. No sign-up, privacy-friendly."
         path="/"
-        jsonLd={[{ "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url + "/", description: "Free online developer tools that run in your browser." }]}
+        jsonLd={[websiteLd(), organizationLd()]}
       />
 
       <section className="relative overflow-hidden border-b border-slate-100 bg-hero">
@@ -61,7 +62,7 @@ export default function Home() {
             Format, convert, decode and test your data with simple browser-based developer utilities.
           </p>
 
-          <div id="search" role="search" className="mx-auto mt-8 flex min-h-14 max-w-2xl items-center gap-2 rounded-2xl border border-slate-200 bg-surface p-1.5 pl-3 shadow-xl shadow-slate-200/50 transition focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-50 sm:mt-9 sm:gap-3 sm:p-2 sm:pl-5">
+          <div id="search" role="search" data-track-area="main" className="mx-auto mt-8 flex min-h-14 max-w-2xl items-center gap-2 rounded-2xl border border-slate-200 bg-surface p-1.5 pl-3 shadow-xl shadow-slate-200/50 transition focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-50 sm:mt-9 sm:gap-3 sm:p-2 sm:pl-5">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-600 sm:h-10 sm:w-10"><Icon name="search" size={19} /></span>
             <input
               id="tool-search"
@@ -80,6 +81,7 @@ export default function Home() {
               className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600 text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:flex sm:w-auto sm:gap-2 sm:px-4"
               onClick={() => document.getElementById("tools")?.scrollIntoView({ behavior: "smooth" })}
               aria-label="Find matching tools"
+              data-track="home.search.submit"
             >
               <span className="hidden text-sm font-bold sm:inline">Find tool</span>
               <Icon name="arrow" size={17} />
@@ -92,6 +94,7 @@ export default function Home() {
               <Link
                 key={t.slug}
                 to={`/${t.slug}`}
+                data-track={`home.popular.${t.slug}`}
                 className="inline-flex min-h-9 items-center font-semibold text-slate-600 underline decoration-slate-200 underline-offset-4 hover:text-brand-600"
               >
                 {t.slug === "api-response-formatter" ? "JSON Formatter" : t.shortName || t.name}
@@ -108,7 +111,10 @@ export default function Home() {
             <h2 className="section-title">Developer tools</h2>
             <p className="section-copy">Everything you need for everyday development tasks.</p>
           </div>
-          <span className="text-sm font-semibold text-slate-400" aria-live="polite">{filtered.length} {filtered.length === 1 ? "tool" : "tools"}</span>
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <span className="text-slate-400" aria-live="polite">{filtered.length} {filtered.length === 1 ? "tool" : "tools"}</span>
+            <Link to="/tools" data-track="home.browse-by-category" className="text-brand-600 underline underline-offset-2">Browse by category</Link>
+          </div>
         </div>
         <div className="-mx-4 mt-6 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0" role="group" aria-label="Filter tools by category">
           <div className="flex min-w-max gap-2 sm:min-w-0 sm:flex-wrap">
@@ -153,24 +159,24 @@ export default function Home() {
             <span className="section-kicker">Why DevTools</span>
             <h2 className="section-title">Built for developers</h2>
             <p className="section-copy mx-auto">Get the answer you need, then get back to building.</p>
-          </div>
+              </div>
           <div className="mt-10 grid gap-4 sm:gap-5 md:grid-cols-3">
             {features.map(([icon, title, copy]) => (
               <div className="feature-card" key={title}>
                 <span className="icon-box"><Icon name={icon} /></span>
                 <h3 className="mt-5 text-lg font-extrabold text-slate-900">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-500">{copy}</p>
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
       </section>
 
       <section className="container-page py-12 sm:py-16 lg:py-20">
         <span className="section-kicker">Quick access</span>
         <h2 className="section-title">Most popular</h2>
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {popular.map((t) => <ToolCard key={t.slug} compact tool={t} />)}
+          {popular.map((t) => <ToolCard key={t.slug} compact tool={t} trackName={`home.popular.${t.slug}`} />)}
         </div>
       </section>
 
@@ -197,6 +203,6 @@ export default function Home() {
           {faqs.map(([q, a]) => <Faq key={q} question={q} answer={a} />)}
         </div>
       </section>
-    </>
+    </main>
   )
 }

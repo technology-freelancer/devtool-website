@@ -4,6 +4,8 @@
  * Used only by scripts/gen-learn-examples.ts and tests/learn.test.ts (never bundled into the site).
  */
 import { format } from "sql-formatter"
+import { aesEncrypt } from "../../lib/aes"
+import { buildPayload } from "../../lib/qr"
 import { decodeBase64, encodeBase64 } from "../../lib/base64"
 import { describeCron } from "../../lib/cron"
 import { jsonToJava } from "../../lib/generators/java"
@@ -15,7 +17,7 @@ import { parseTimestamp } from "../../lib/timestamp"
 
 const b64url = (o: unknown) => encodeBase64(JSON.stringify(o), true)
 
-export function computeExamples() {
+export async function computeExamples() {
   const javaJson = `{
   "id": 101,
   "user_name": "John",
@@ -45,8 +47,26 @@ export function computeExamples() {
   const diffA = `{"name":"DevTools","version":1,"active":true,"tags":["json","api"],"owner":{"id":7,"team":"core"}}`
   const diffB = `{"name":"DevTools Pro","version":2,"tags":["json","api","diff"],"owner":{"id":7,"team":"platform"},"beta":true}`
   const ts = parseTimestamp("1747751400")
+  const aesKey256 = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+  const aesIv12 = "000102030405060708090a0b"
+  const aesKey128 = "000102030405060708090a0b0c0d0e0f"
+  const aesIv16 = "101112131415161718191a1b1c1d1e1f"
+  const aesPlain = "Hello, DevTools!"
+  const rawOptions = { keySource: "raw", keyFormat: "hex", ivFormat: "hex", encoding: "hex" } as const
+  const qrFields = { text: "", ssid: "Home WiFi", password: "pa;ss", security: "WPA", hidden: false, email: "hello@example.com", subject: "Hello there", body: "", phone: "+91 98765 43210" } as const
 
   return {
+    aesKey256,
+    aesIv12,
+    aesKey128,
+    aesIv16,
+    aesPlain,
+    aesGcmHex: await aesEncrypt(aesPlain, { ...rawOptions, mode: "GCM", keyBits: 256, secret: aesKey256, iv: aesIv12 }),
+    aesCbcHex: await aesEncrypt(aesPlain, { ...rawOptions, mode: "CBC", keyBits: 128, secret: aesKey128, iv: aesIv16 }),
+    aesCtrHex: await aesEncrypt(aesPlain, { ...rawOptions, mode: "CTR", keyBits: 128, secret: aesKey128, iv: aesIv16 }),
+    qrWifi: buildPayload("wifi", { ...qrFields }),
+    qrEmail: buildPayload("email", { ...qrFields }),
+    qrPhone: buildPayload("phone", { ...qrFields }),
     javaJson,
     javaRecord: jsonToJava(javaJson, { rootName: "User", packageName: "", style: "record", jackson: true }),
     javaLombok: jsonToJava(javaJson, { rootName: "User", packageName: "com.example.model", style: "lombok", jackson: true }),

@@ -62,7 +62,7 @@ export default function JwtDecoder() {
     : []
 
   return (
-    <div className="container-page py-8 sm:py-10">
+    <div className="container-page py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="rounded-(--radius-card) border border-slate-200 bg-surface p-4 shadow-(--shadow-card) sm:p-6">
         <div className="mb-3 flex items-center justify-between gap-2">
           <label htmlFor="jwt-input" className="text-sm font-extrabold text-slate-800">JWT Token</label>
@@ -79,8 +79,8 @@ export default function JwtDecoder() {
           autoCorrect="off"
         />
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => setToken(makeSampleJwt())}>Sample</Button>
-          <Button variant="secondary" onClick={() => { setToken(""); analytics.clear() }}>Clear</Button>
+          <Button data-track="jwt.sample" variant="secondary" onClick={() => setToken(makeSampleJwt())}>Sample</Button>
+          <Button data-track="jwt.clear" variant="secondary" onClick={() => { setToken(""); analytics.clear() }}>Clear</Button>
         </div>
       </div>
 

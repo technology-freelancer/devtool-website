@@ -6,6 +6,7 @@ import { OptionSelect, OptionToggle } from "@/components/OptionControls"
 import { useToolAnalytics } from "@/hooks/useToolAnalytics"
 import { copyText } from "@/lib/clipboard"
 import { downloadText } from "@/lib/download"
+import { traceToolRun } from "@/lib/monitoring"
 
 type Version = "v4" | "v7" | "v1"
 const GEN: Record<Version, () => string> = { v4: () => v4(), v7: () => v7(), v1: () => v1() }
@@ -28,14 +29,15 @@ export default function UuidGenerator() {
   const [copied, setCopied] = useState(false)
 
   const safeCount = Math.min(1000, Math.max(1, Math.floor(count) || 1))
-  const run = () => {
+  const run = async () => {
     a.used()
-    setOutput(generate(version, safeCount, upper, hyphens))
+    const output = await traceToolRun("uuid-generator", safeCount * 36, () => generate(version, safeCount, upper, hyphens))
+    setOutput(output)
     a.success({ option: version })
   }
 
   return (
-    <div className="container-page max-w-5xl py-8 sm:py-10">
+    <div className="container-page max-w-5xl py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="mb-4 flex flex-wrap items-end gap-3 rounded-(--radius-card) border border-slate-200 bg-surface p-3 sm:gap-4 sm:p-4">
         <OptionSelect label="Version" value={version} onChange={(v) => setVersion(v as Version)} options={[{ value: "v4", label: "v4 (random)" }, { value: "v7", label: "v7 (time-ordered)" }, { value: "v1", label: "v1 (timestamp)" }]} />
         <label className="block">
@@ -55,9 +57,10 @@ export default function UuidGenerator() {
       </div>
       <Editor label="Generated UUIDs" value={output} readOnly badge={version.toUpperCase()} lineNumbers />
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={run} className="w-full sm:w-auto">Generate UUIDs</Button>
+        <Button data-track="uuid.generate" onClick={() => void run()} className="w-full sm:w-auto">Generate UUIDs</Button>
         <Button
           variant="secondary"
+          data-track="uuid.copy"
           icon={copied ? "check" : "copy"}
           onClick={async () => {
             if (await copyText(output)) { a.copy(); setCopied(true); setTimeout(() => setCopied(false), 1800) }
@@ -65,7 +68,7 @@ export default function UuidGenerator() {
         >
           {copied ? "Copied" : "Copy"}
         </Button>
-        <Button variant="secondary" icon="download" onClick={() => { downloadText("uuids.txt", output + "\n"); a.download() }}>Download</Button>
+        <Button data-track="uuid.download" variant="secondary" icon="download" onClick={() => { downloadText("uuids.txt", output + "\n"); a.download() }}>Download</Button>
       </div>
       <p className="mt-4 text-xs text-slate-400">Generated in your browser with a cryptographically secure random source. Nothing is uploaded.</p>
     </div>

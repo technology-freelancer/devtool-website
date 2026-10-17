@@ -16,8 +16,8 @@ const words = (b: Block): number => {
 }
 
 describe("Learn content", () => {
-  it("worked examples match the real tool output (run: npx tsx scripts/gen-learn-examples.ts to refresh)", () => {
-    expect(JSON.parse(JSON.stringify(EX))).toEqual(JSON.parse(JSON.stringify(computeExamples())))
+  it("worked examples match the real tool output (run: npx tsx scripts/gen-learn-examples.ts to refresh)", async () => {
+    expect(JSON.parse(JSON.stringify(EX))).toEqual(JSON.parse(JSON.stringify(await computeExamples())))
   })
 
   for (const t of tools) {

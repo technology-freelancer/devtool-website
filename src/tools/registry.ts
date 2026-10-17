@@ -104,9 +104,25 @@ export const tools: Tool[] = [
     features: ["Added, removed and changed values with paths", "Key order is ignored", "Array items matched by id when available", "Swap the two sides in one click"],
     faqs: [["Does key order matter?", "No. Objects are compared by key, so reordering keys is not reported as a change."], ["How are arrays compared?", "Items with an id (or _id, key) are matched by that value. Other items are matched by position."], ["Is my JSON uploaded?", "No. The comparison runs in your browser."]],
   },
+  {
+    slug: "aes-encryption-decryption", name: "AES Encryption / Decryption", shortName: "AES Encrypt / Decrypt", description: "Encrypt and decrypt text with AES-128 or AES-256.", icon: "lock", category: "Security",
+    seoTitle: "AES Encryption and Decryption Online",
+    seoDescription: "Encrypt and decrypt text with AES-128 or AES-256 (GCM, CBC, CTR) using a password or your own key and IV. Free, runs in your browser.",
+    steps: [["Choose encrypt or decrypt", "Pick an algorithm (AES-GCM is recommended) and a key size of 128 or 256 bits."], ["Enter a password, or your own key and IV", "Password mode derives a strong key for you. Raw mode lets you match another system's key and IV."], ["Copy the result", "Copy the encrypted or decrypted text, or download it as a file."]],
+    features: ["AES-128 and AES-256 in GCM, CBC and CTR modes", "Password mode with PBKDF2 (600,000 iterations) and a random salt", "Raw key and IV mode for working with other systems", "Base64 or hex ciphertext, with full Unicode support"],
+    faqs: [["Which AES mode should I choose?", "Use AES-GCM. It also detects tampering, so wrong passwords and modified data fail loudly. CBC and CTR do not authenticate the data and are mainly here for compatibility with existing systems."], ["Why is ECB mode not offered?", "ECB encrypts identical blocks to identical output, which leaks patterns in your data. It is not safe for real data, so this tool does not include it."], ["Can I decrypt data that another system encrypted?", "Yes, if you match its settings exactly: mode, key size, key, IV, padding and output format. Use the Raw key + IV option for this."]],
+  },
+  {
+    slug: "qr-code-generator", name: "QR Code Generator", description: "Create QR codes for links, text, Wi-Fi, email and phone.", icon: "qr", category: "Generate",
+    seoTitle: "Free QR Code Generator (PNG and SVG)",
+    seoDescription: "Create a free QR code for a link, text, Wi-Fi, email or phone number. Choose colours and error correction, then download PNG or SVG. No sign-up.",
+    steps: [["Choose what to encode", "Pick link or text, Wi-Fi, email or phone and fill in the details."], ["Customize it", "Set the error-correction level, size and colours. A warning appears if the colours may not scan."], ["Download", "Download a PNG for screens or an SVG for print and any size."]],
+    features: ["Link, text, Wi-Fi, email and phone codes", "PNG and SVG download", "Four error-correction levels", "Static codes that never expire and need no account"],
+    faqs: [["Do these QR codes expire?", "No. They are static codes: the data is stored in the image itself, so they work forever and do not depend on our server."], ["Should I download PNG or SVG?", "Use SVG for print and anything that must scale, because it stays sharp at any size. Use PNG for screens, documents and social posts."], ["Which error-correction level should I use?", "Medium is a good default. Choose High if the code may get dirty or damaged, or if you place a logo over it."]],
+  },
 ]
 
-export const popularSlugs = ["jwt-decoder", "api-response-formatter", "json-to-java", "sql-formatter"]
+export const popularSlugs = ["jwt-decoder", "api-response-formatter", "qr-code-generator", "json-to-java"]
 
 export const getTool = (slug?: string) => tools.find((t) => t.slug === slug)
 

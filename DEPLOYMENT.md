@@ -4,7 +4,7 @@ The build output (`dist/`) is plain static files. Any static host works. Cloudfl
 
 ## 1. Before the first deploy
 1. Set in `.env` (or in your host's environment variables):
-   - `VITE_SITE_URL=https://your-domain.com` (no trailing slash)
+   - `VITE_SITE_URL=https://devtools-com.vercel.app` (no trailing slash)
    - `VITE_CONTACT_EMAIL=you@your-domain.com`
    - `VITE_OPERATOR_NAME=Your Name or Company`
 2. Run `npm run build`. The build prints a warning while these are unset.
@@ -28,7 +28,7 @@ Netlify and Vercel use the same settings. `public/_headers` (Cloudflare/Netlify)
 
 ## 4. Google Search Console
 1. Add a **Domain** property and verify with the DNS TXT record at your domain registrar.
-2. Sitemaps > submit `https://your-domain.com/sitemap.xml`.
+2. Sitemaps > submit `https://devtools-com.vercel.app/sitemap.xml`.
 3. URL inspection > request indexing for the home page and your top 3 tools.
 4. Check back weekly: Performance (queries, clicks), Pages (indexing errors).
 

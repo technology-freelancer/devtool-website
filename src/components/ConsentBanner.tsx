@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { applyConsent } from "@/lib/analytics"
+import { applyConsent, track } from "@/lib/analytics"
 import { getConsent, setConsent } from "@/lib/consent"
 import Button from "./Button"
 import Icon from "./Icon"
@@ -20,12 +20,14 @@ export default function ConsentBanner() {
   const choose = (value: "granted" | "denied") => {
     setConsent(value)
     applyConsent(value === "granted")
+    track("consent_choice", { choice: value })
     setOpen(false)
   }
 
   return (
     <div
       role="dialog"
+      data-track-area="consent-banner"
       aria-labelledby="consent-title"
       aria-describedby="consent-description"
       className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3 sm:inset-x-auto sm:bottom-5 sm:left-5 sm:w-[min(35rem,calc(100vw-2.5rem))] sm:px-0 sm:pb-0"
@@ -50,8 +52,8 @@ export default function ConsentBanner() {
           </div>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 sm:ml-[3.625rem] sm:mt-3 sm:flex sm:justify-end">
-          <Button variant="secondary" className="w-full sm:order-1 sm:w-auto" onClick={() => choose("denied")}>Decline optional</Button>
-          <Button className="w-full sm:order-2 sm:w-auto" onClick={() => choose("granted")}>Allow analytics</Button>
+          <Button data-track="consent.decline" variant="secondary" className="w-full sm:order-1 sm:w-auto" onClick={() => choose("denied")}>Decline optional</Button>
+          <Button data-track="consent.allow" className="w-full sm:order-2 sm:w-auto" onClick={() => choose("granted")}>Allow analytics</Button>
         </div>
       </div>
     </div>

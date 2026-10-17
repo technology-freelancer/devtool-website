@@ -16,8 +16,10 @@ const assets = existsSync(join(dist, "assets")) ? readdirSync(join(dist, "assets
 const font = assets.find((f) => /^manrope-latin-wght-normal.*\.woff2$/.test(f))
 const preload = font ? `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />\n    ` : ""
 
+const modifiedByRoute = {}
 async function page(url, noindexFallback = false) {
-  const { html, head } = await render(url)
+  const { html, head, modified } = await render(url)
+  modifiedByRoute[url] = modified
   const route = url.length > 1 ? url.replace(/\/+$/, "") : url
   const headBlock = head || (noindexFallback ? '<meta name="robots" content="noindex" />' : "")
   return template
@@ -34,7 +36,13 @@ for (const url of routes) {
 // Real 404 page (Cloudflare Pages, Netlify and Vercel serve /404.html for unknown URLs)
 writeFileSync(join(dist, "404.html"), await page("/page-not-found", true))
 
-console.log(`Pre-rendered ${routes.length} pages + 404.html; copied public sitemap.xml and robots.txt`)
+const urls = routes
+  .map((url) => `  <url><loc>${SITE.url}${url === "/" ? "/" : url}</loc><lastmod>${modifiedByRoute[url]}</lastmod></url>`)
+  .join("\n")
+writeFileSync(join(dist, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`)
+writeFileSync(join(dist, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE.url}/sitemap.xml\n`)
+
+console.log(`Pre-rendered ${routes.length} pages + 404.html, sitemap.xml, robots.txt`)
 if (SITE.url.includes("example.com")) {
   console.warn("\n⚠  VITE_SITE_URL is not set. Canonical URLs and the sitemap use a placeholder domain.\n   Set it in .env before deploying (see DEPLOYMENT.md).\n")
 }

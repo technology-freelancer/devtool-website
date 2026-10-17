@@ -5,5 +5,9 @@ export const SITE = {
   email: (import.meta.env.VITE_CONTACT_EMAIL as string | undefined) ?? "hellothefreelancer@gmail.com",
   operator: (import.meta.env.VITE_OPERATOR_NAME as string | undefined) ?? "DevTools",
   tagline: "Free online developer tools",
-  legalUpdated: "October 10, 2026",
+  legalUpdated: "October 15, 2026",
+  /** ISO date for pages without their own content date. Update when those pages change. */
+  lastModified: "2026-10-15",
+  imageAlt: "DevTools: free online developer tools that run in your browser",
 }
+export const SITE_IMAGE = `${SITE.url}/og-image.svg`

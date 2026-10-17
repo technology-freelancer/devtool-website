@@ -9,6 +9,7 @@ type Props = {
   type?: "button" | "submit"
   disabled?: boolean
   className?: string
+  "data-track"?: string
 }
 
 const styles = {
@@ -18,11 +19,12 @@ const styles = {
 }
 
 export default function Button({
-  children, variant = "primary", icon, onClick, type = "button", disabled = false, className = "",
+  children, variant = "primary", icon, onClick, type = "button", disabled = false, className = "", "data-track": dataTrack,
 }: Props) {
   return (
     <button
       type={type}
+      data-track={dataTrack}
       disabled={disabled}
       onClick={onClick}
       className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-(--radius-control) border px-4 text-sm font-bold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${styles[variant]} ${className}`}

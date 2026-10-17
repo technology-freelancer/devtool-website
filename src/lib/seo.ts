@@ -1,4 +1,4 @@
-import { SITE } from "@/config/site"
+import { SITE, SITE_IMAGE } from "@/config/site"
 
 export type SeoMeta = {
   title: string
@@ -6,6 +6,7 @@ export type SeoMeta = {
   path: string
   noindex?: boolean
   jsonLd?: object[]
+  image?: string
 }
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -25,13 +26,17 @@ export function headHtml(m: SeoMeta): string {
     `<meta name="description" content="${esc(m.description)}" />`,
     m.noindex ? `<meta name="robots" content="noindex" />` : `<link rel="canonical" href="${esc(url)}" />`,
     `<meta property="og:type" content="website" />`,
+    `<meta property="og:locale" content="en_US" />`,
     `<meta property="og:site_name" content="${esc(SITE.name)}" />`,
     `<meta property="og:title" content="${esc(m.title)}" />`,
     `<meta property="og:description" content="${esc(m.description)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,
-    `<meta name="twitter:card" content="summary" />`,
+    `<meta property="og:image" content="${esc(m.image ?? SITE_IMAGE)}" />`,
+    `<meta property="og:image:alt" content="${esc(SITE.imageAlt)}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:title" content="${esc(m.title)}" />`,
     `<meta name="twitter:description" content="${esc(m.description)}" />`,
+    `<meta name="twitter:image" content="${esc(m.image ?? SITE_IMAGE)}" />`,
     ...(m.jsonLd ?? []).map((o) => `<script type="application/ld+json" data-seo>${ld(o)}</script>`),
   ]
   return tags.join("\n    ")
@@ -55,9 +60,13 @@ export function applyHead(m: SeoMeta) {
   meta("property", "og:title", m.title)
   meta("property", "og:description", m.description)
   meta("property", "og:url", url)
-  meta("name", "twitter:card", "summary")
+  meta("property", "og:locale", "en_US")
+  meta("property", "og:image", m.image ?? SITE_IMAGE)
+  meta("property", "og:image:alt", SITE.imageAlt)
+  meta("name", "twitter:card", "summary_large_image")
   meta("name", "twitter:title", m.title)
   meta("name", "twitter:description", m.description)
+  meta("name", "twitter:image", m.image ?? SITE_IMAGE)
   const robots = document.head.querySelector('meta[name="robots"]')
   if (m.noindex) meta("name", "robots", "noindex")
   else robots?.remove()

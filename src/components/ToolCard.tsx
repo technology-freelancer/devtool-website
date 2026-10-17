@@ -2,9 +2,9 @@ import { Link } from "react-router-dom"
 import type { Tool } from "@/tools/registry"
 import Icon from "./Icon"
 
-export default function ToolCard({ tool, compact = false, onSelect }: { tool: Tool; compact?: boolean; onSelect?: () => void }) {
+export default function ToolCard({ tool, compact = false, onSelect, trackName }: { tool: Tool; compact?: boolean; onSelect?: () => void; trackName?: string }) {
   return (
-    <Link to={`/${tool.slug}`} onClick={onSelect} className={`group block w-full text-left ${compact ? "popular-card" : "tool-card"}`}>
+    <Link to={`/${tool.slug}`} data-track={trackName ?? "card.tool." + tool.slug} onClick={onSelect} className={`group block w-full text-left ${compact ? "popular-card" : "tool-card"}`}>
       <span className={compact ? "icon-box-sm" : "icon-box"}>
         <Icon name={tool.icon} size={compact ? 19 : 22} />
       </span>

@@ -51,15 +51,15 @@ export default function JsonDiff() {
   const count = (t: Change["type"]) => changes?.filter((c) => c.type === t).length ?? 0
 
   return (
-    <div className="container-page py-8 sm:py-10">
+    <div className="container-page py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="grid gap-5 lg:grid-cols-2">
         <Editor label="JSON A (original)" value={a} onChange={setA} badge="JSON" lineNumbers />
         <Editor label="JSON B (changed)" value={b} onChange={setB} badge="JSON" lineNumbers />
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button onClick={compare} className="w-full sm:w-auto">Compare JSON</Button>
-        <Button variant="secondary" icon="swap" onClick={() => { setA(b); setB(a) }}>Swap</Button>
-        <Button variant="secondary" onClick={() => { setA(""); setB(""); setChanges(null); setError(null); analytics.clear() }}>Clear</Button>
+        <Button data-track="diff.compare" onClick={compare} className="w-full sm:w-auto">Compare JSON</Button>
+        <Button data-track="diff.swap" variant="secondary" icon="swap" onClick={() => { setA(b); setB(a) }}>Swap</Button>
+        <Button data-track="diff.clear" variant="secondary" onClick={() => { setA(""); setB(""); setChanges(null); setError(null); analytics.clear() }}>Clear</Button>
       </div>
       {error && <ErrorNote message={error} />}
 

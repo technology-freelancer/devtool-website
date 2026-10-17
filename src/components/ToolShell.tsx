@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { Link } from "react-router-dom"
 import { SITE } from "@/config/site"
 import { track } from "@/lib/analytics"
+import { breadcrumbLd } from "@/lib/schema"
 import { canonicalUrl } from "@/lib/seo"
 import { useLearn } from "@/tools/learn"
 import LearnSection from "@/tools/learn/LearnSection"
@@ -15,51 +16,82 @@ export function toolTitle(tool: Tool) {
   return tool.slug.startsWith("json-to-") ? `${tool.name} Converter` : tool.name
 }
 
-const PRIVACY_FAQ: [string, string] = ["Is my input saved or uploaded?", "No. Everything is processed locally in your browser. Your input is never sent to our servers or to analytics."]
+const PRIVACY_FAQ: [string, string] = [
+  "Is my input saved or uploaded?",
+  "No. Everything is processed locally in your browser. Your input is never sent to our servers or to analytics.",
+]
 
-function jsonLd(tool: Tool) {
+function jsonLd(tool: Tool, modified: string) {
   const url = canonicalUrl(`/${tool.slug}`)
   const faqs = [...tool.faqs, PRIVACY_FAQ]
   return [
-    { "@context": "https://schema.org", "@type": "WebApplication", name: toolTitle(tool), url, description: tool.seoDescription, applicationCategory: "DeveloperApplication", operatingSystem: "Any", browserRequirements: "Requires JavaScript", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } },
-    { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map(([q, a]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })) },
-    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE.url + "/" }, { "@type": "ListItem", position: 2, name: toolTitle(tool), item: url }] },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: toolTitle(tool),
+      url,
+      description: tool.seoDescription,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Any",
+      browserRequirements: "Requires JavaScript",
+      inLanguage: "en",
+      isAccessibleForFree: true,
+      featureList: tool.features,
+      dateModified: modified,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map(([q, a]) => ({
+        "@type": "Question",
+        name: q,
+        acceptedAnswer: { "@type": "Answer", text: a },
+      })),
+    },
+    breadcrumbLd([
+      { name: "Home", path: "/" },
+      { name: "All tools", path: "/tools" },
+      { name: toolTitle(tool), path: `/${tool.slug}` },
+    ]),
   ]
 }
 
-/**
- * The reusable page frame for EVERY tool: SEO title/description, breadcrumb, heading,
- * the tool workspace (children), ad slot, how-to, features, FAQ and related tools.
- */
+/** The reusable page frame for every tool page. */
 export default function ToolShell({ tool, children }: { tool: Tool; children: ReactNode }) {
   const learn = useLearn(tool.slug)
+
   return (
     <main className="bg-slate-50/40">
-      <Seo title={`${tool.seoTitle} | ${SITE.name}`} description={tool.seoDescription} path={`/${tool.slug}`} jsonLd={jsonLd(tool)} />
+      <Seo
+        title={`${tool.seoTitle} | ${SITE.name}`}
+        description={tool.seoDescription}
+        path={`/${tool.slug}`}
+        jsonLd={jsonLd(tool, learn?.updatedIso ?? SITE.lastModified)}
+      />
 
       <div className="container-page pt-7 sm:pt-9 lg:pt-12">
         <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 text-sm text-slate-500">
           <Link to="/" className="inline-flex min-h-9 items-center hover:text-brand-600">Home</Link>
           <span aria-hidden="true">/</span>
-          <Link to="/#tools" className="inline-flex min-h-9 items-center hover:text-brand-600">Developer Tools</Link>
+          <Link to="/tools" className="inline-flex min-h-9 items-center hover:text-brand-600">All tools</Link>
           <span aria-hidden="true">/</span>
           <span className="font-semibold text-slate-700">{tool.name}</span>
         </nav>
-        <div className="mt-6 flex items-start gap-3 sm:mt-8 sm:gap-4">
+
+        <header className="mt-5 flex items-start gap-4 sm:mt-7">
           <span className="icon-box-lg"><Icon name={tool.icon} size={26} /></span>
           <div className="min-w-0">
             <span className="section-kicker">{tool.category} tool</span>
             <h1 className="heading-page mt-1">{toolTitle(tool)}</h1>
             <p className="mt-3 text-base text-slate-600">{tool.description}</p>
           </div>
-        </div>
+        </header>
       </div>
 
       {children}
 
-      {/* <div className="container-page py-6"><AdSlot /></div> */}
-
-      <section className="container-narrow py-10 sm:py-14">
+      <section data-track-area="tool-guide" className="container-narrow py-10 sm:py-14">
         <div className="prose-section">
           <span className="section-kicker">Quick guide</span>
           <h2 className="section-title">How to use {tool.name}</h2>
@@ -77,12 +109,12 @@ export default function ToolShell({ tool, children }: { tool: Tool; children: Re
         <div className="mt-10 sm:mt-12">
           <h2 className="text-xl font-black text-slate-950 sm:text-2xl">Supported features</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {tool.features.map((f) => (
-              <div key={f} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
+            {tool.features.map((feature) => (
+              <div key={feature} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
                 <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-emerald-50 text-emerald-600">
                   <Icon name="check" size={14} />
                 </span>
-                {f}
+                {feature}
               </div>
             ))}
           </div>
@@ -100,12 +132,13 @@ export default function ToolShell({ tool, children }: { tool: Tool; children: Re
         <div className="container-page py-10 sm:py-12">
           <h2 className="text-xl font-black text-slate-950">Related developer tools</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {relatedTools(tool).map((t) => (
+            {relatedTools(tool).map((relatedTool) => (
               <ToolCard
-                key={t.slug}
+                key={relatedTool.slug}
                 compact
-                tool={t}
-                onSelect={() => track("related_tool_clicked", { tool: tool.slug, to_tool: t.slug })}
+                tool={relatedTool}
+                trackName={`card.related.${relatedTool.slug}`}
+                onSelect={() => track("related_tool_clicked", { tool: tool.slug, to_tool: relatedTool.slug })}
               />
             ))}
           </div>

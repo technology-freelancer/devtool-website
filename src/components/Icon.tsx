@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 export type IconName =
   | "braces" | "code" | "shield" | "clock" | "database" | "regex" | "api"
   | "spark" | "swap" | "calendar" | "diff" | "search" | "arrow" | "menu"
-  | "x" | "lock" | "bolt" | "gift" | "copy" | "download" | "check" | "chevron"
+  | "x" | "lock" | "bolt" | "gift" | "copy" | "download" | "check" | "chevron" | "qr"
 
 const paths: Record<IconName, ReactNode> = {
   braces: (<><path d="M8 3H6a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2" /><path d="M16 3h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2" /></>),
@@ -28,6 +28,7 @@ const paths: Record<IconName, ReactNode> = {
   download: (<><path d="M12 3v12M7 10l5 5 5-5" /><path d="M5 21h14" /></>),
   check: <path d="m5 12 4 4L19 6" />,
   chevron: <path d="m9 18 6-6-6-6" />,
+  qr: (<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v1M14 20h1M17 20h4v-3" /></>),
 }
 
 export default function Icon({ name, size = 20 }: { name: IconName; size?: number }) {

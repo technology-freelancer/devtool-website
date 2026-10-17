@@ -4,11 +4,13 @@ import { BrowserRouter } from "react-router-dom"
 import App from "./app/App"
 import ErrorBoundary from "./components/ErrorBoundary"
 import { initAnalytics } from "./lib/analytics"
+import { initClickTracking } from "./lib/clickTracking"
 import { initMonitoring } from "./lib/monitoring"
 import { preloadLearnForPath } from "./tools/learn"
 import "./style.css"
 
 initAnalytics()
+initClickTracking()
 initMonitoring()
 
 const tree = (

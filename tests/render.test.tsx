@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs"
+import { resolve } from "node:path"
 import { renderToString } from "react-dom/server"
 import { MemoryRouter } from "react-router-dom"
 import { describe, expect, it } from "vitest"
@@ -29,6 +31,13 @@ describe("tool workspaces render without errors", () => {
 })
 
 describe("registry and pre-render", () => {
+  it("initializes click tracking only from the browser entry", () => {
+    const main = readFileSync(resolve(process.cwd(), "src/main.tsx"), "utf8")
+    const server = readFileSync(resolve(process.cwd(), "src/entry-server.tsx"), "utf8")
+    expect(main).toContain("initClickTracking()")
+    expect(server).not.toContain("initClickTracking")
+  })
+
   it("every tool has a component, SEO text and unique slug", () => {
     expect(new Set(tools.map((t) => t.slug)).size).toBe(tools.length)
     expect(new Set(tools.map((t) => t.seoTitle)).size).toBe(tools.length)

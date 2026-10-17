@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 
 import { useToolAnalytics } from "@/hooks/useToolAnalytics"
 import { copyText, readClipboard } from "@/lib/clipboard"
 import { downloadText } from "@/lib/download"
+import { traceToolRun } from "@/lib/monitoring"
 import { ToolError } from "@/lib/toolError"
 import Button from "./Button"
 import Editor from "./Editor"
@@ -16,7 +17,7 @@ type Props = {
   sample: string
   actionLabel: string
   /** Pure function: input text -> output text. Throw ToolError for user-fixable problems. */
-  run: (input: string) => string
+  run: (input: string) => string | Promise<string>
   filename: string
   mime?: string
   /** Optional option controls (selects, toggles) shown above the editors. */
@@ -24,6 +25,8 @@ type Props = {
   lineNumbers?: boolean
   /** Changes whenever an option changes; re-runs automatically once a result exists. */
   runKey?: string
+  /** Run once on load and whenever runKey changes. Turn off for slow or secret-dependent tools. */
+  autoRun?: boolean
 }
 
 /**
@@ -33,15 +36,16 @@ type Props = {
  */
 export default function TextToolWorkspace({
   slug, inputLabel, outputLabel, inputBadge, outputBadge, sample, actionLabel,
-  run, filename, mime = "text/plain", options, lineNumbers = true, runKey = "",
+  run, filename, mime = "text/plain", options, lineNumbers = true, runKey = "", autoRun = true,
 }: Props) {
   const analytics = useToolAnalytics(slug)
   const [input, setInput] = useState(sample)
   const [output, setOutput] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [busy, setBusy] = useState(false)
 
-  const execute = (silent = false) => {
+  const execute = async (silent = false) => {
     if (!silent) analytics.used()
     if (!input.trim()) {
       setOutput("")
@@ -52,7 +56,9 @@ export default function TextToolWorkspace({
       return
     }
     try {
-      setOutput(run(input))
+      setBusy(true)
+      const result = await traceToolRun(slug, new Blob([input]).size, () => run(input))
+      setOutput(result)
       setError(null)
       if (!silent) analytics.success()
     } catch (e) {
@@ -64,6 +70,8 @@ export default function TextToolWorkspace({
         setError("Something went wrong while processing your input.")
         if (!silent) analytics.error("unexpected")
       }
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -71,13 +79,13 @@ export default function TextToolWorkspace({
   const executeRef = useRef(execute)
   executeRef.current = execute
   useEffect(() => {
-    executeRef.current(true)
-  }, [runKey])
+    if (autoRun) void executeRef.current(true)
+  }, [runKey, autoRun])
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
       e.preventDefault()
-      execute()
+      void execute()
     }
   }
 
@@ -113,7 +121,7 @@ export default function TextToolWorkspace({
   }
 
   return (
-    <div className="container-page py-8 sm:py-10">
+    <div className="container-page py-8 sm:py-10" data-track-area="tool-workspace">
       {options && (
         <div className="mb-4 flex flex-wrap items-end gap-3 rounded-(--radius-card) border border-slate-200 bg-surface p-3 sm:gap-4 sm:p-4">
           {options}
@@ -131,10 +139,10 @@ export default function TextToolWorkspace({
             placeholder="Paste or type here…  (Ctrl/Cmd + Enter to run)"
           />
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button onClick={() => execute()} className="w-full sm:w-auto">{actionLabel}</Button>
-            <Button variant="secondary" onClick={paste}>Paste</Button>
-            <Button variant="secondary" onClick={() => { setInput(sample); setError(null) }}>Sample</Button>
-            <Button variant="secondary" onClick={clear}>Clear</Button>
+            <Button data-track="tool.run" onClick={() => void execute()} disabled={busy} className="w-full sm:w-auto">{busy ? "Working…" : actionLabel}</Button>
+            <Button data-track="tool.paste" variant="secondary" onClick={paste}>Paste</Button>
+            <Button data-track="tool.sample" variant="secondary" onClick={() => { setInput(sample); setError(null) }}>Sample</Button>
+            <Button data-track="tool.clear" variant="secondary" onClick={clear}>Clear</Button>
           </div>
         </div>
         <div className="min-w-0">
@@ -147,10 +155,10 @@ export default function TextToolWorkspace({
             placeholder="Your result appears here"
           />
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button variant="secondary" icon={copied ? "check" : "copy"} onClick={copy} disabled={!output}>
+            <Button data-track="tool.copy" variant="secondary" icon={copied ? "check" : "copy"} onClick={copy} disabled={!output}>
               {copied ? "Copied" : "Copy"}
             </Button>
-            <Button variant="secondary" icon="download" onClick={download} disabled={!output}>
+            <Button data-track="tool.download" variant="secondary" icon="download" onClick={download} disabled={!output}>
               Download
             </Button>
           </div>

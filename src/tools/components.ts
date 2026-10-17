@@ -16,4 +16,6 @@ export const toolComponents: Record<string, LazyExoticComponent<ComponentType>> 
   "base64-converter": lazy(() => import("./base64-converter/Base64Converter")),
   "timestamp-converter": lazy(() => import("./timestamp-converter/TimestampConverter")),
   "json-diff": lazy(() => import("./json-diff/JsonDiff")),
+  "aes-encryption-decryption": lazy(() => import("./aes-encryption-decryption/AesTool")),
+  "qr-code-generator": lazy(() => import("./qr-code-generator/QrCodeGenerator")),
 }

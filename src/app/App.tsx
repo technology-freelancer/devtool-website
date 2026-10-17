@@ -6,9 +6,10 @@ import Header from "@/components/Header"
 import RouteTracker from "@/components/RouteTracker"
 import ScrollManager from "@/components/ScrollManager"
 import Home from "@/pages/Home"
-import { ContactPage, PrivacyPage, TermsPage } from "@/pages/LegalPages"
+import { AboutPage, ContactPage, PrivacyPage, TermsPage } from "@/pages/LegalPages"
 import NotFound from "@/pages/NotFound"
 import ToolPage from "@/pages/ToolPage"
+import ToolsPage from "@/pages/ToolsPage"
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/tools" element={<ToolsPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/contact" element={<ContactPage />} />

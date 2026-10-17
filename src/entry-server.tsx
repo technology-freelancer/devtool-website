@@ -2,7 +2,8 @@ import { prerenderToNodeStream } from "react-dom/static"
 import { StaticRouter } from "react-router-dom"
 import App from "./app/App"
 import { headHtml, takeServerHead } from "./lib/seo"
-import { preloadLearnForPath } from "./tools/learn"
+import { SITE } from "./config/site"
+import { getLearn, preloadLearnForPath } from "./tools/learn"
 
 export { routes } from "./app/routes"
 export { SITE } from "./config/site"
@@ -23,5 +24,6 @@ export async function render(url: string) {
   for await (const chunk of prelude) html += decoder.decode(chunk as Uint8Array, { stream: true })
   html += decoder.decode()
   const head = takeServerHead()
-  return { html, head: head ? headHtml(head) : "" }
+  const slug = url.replace(/^\/+|\/+$/g, "")
+  return { html, head: head ? headHtml(head) : "", modified: getLearn(slug)?.updatedIso ?? SITE.lastModified }
 }

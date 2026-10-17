@@ -54,14 +54,14 @@ export default function TimestampConverter() {
   const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   return (
-    <div className="container-page max-w-6xl py-8 sm:py-10">
+    <div className="container-page max-w-6xl py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-(--radius-card) border border-brand-100 bg-brand-50/60 p-4 sm:p-5">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-brand-700">Current Unix time</span>
           <div className="mt-1 font-mono text-2xl font-extrabold text-slate-900">{Math.floor(now / 1000)}</div>
         </div>
         <div className="flex gap-2">
-          <Button variant="secondary" onClick={() => { setInput(String(Math.floor(Date.now() / 1000))); setUnit("seconds") }}>Use now</Button>
+          <Button data-track="timestamp.use-now" variant="secondary" onClick={() => { setInput(String(Math.floor(Date.now() / 1000))); setUnit("seconds") }}>Use now</Button>
           <CopyIconButton text={String(Math.floor(now / 1000))} label="Copy current timestamp" onCopy={analytics.copy} />
         </div>
       </div>

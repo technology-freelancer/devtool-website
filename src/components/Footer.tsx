@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom"
 import { openConsentSettings } from "@/lib/consent"
 import { SITE } from "@/config/site"
-import { getTool, popularSlugs } from "@/tools/registry"
+import { tools } from "@/tools/registry"
 import Logo from "./Logo"
-
-const popularTools = popularSlugs.map(getTool).filter((tool) => tool !== undefined)
 
 const socials = [
   { label: "GitHub", href: "https://github.com/devtools-com", icon: "github" },
@@ -41,7 +39,7 @@ function SocialIcon({ name }: { name: "github" | "linkedin" | "instagram" | "mdn
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-50" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+    <footer data-track-area="footer" className="border-t border-slate-200 bg-slate-50" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="container-page py-10 sm:py-12">
         <div className="grid gap-9 border-b border-slate-200 pb-9 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10 lg:pb-10">
           <div className="max-w-sm">
@@ -52,13 +50,13 @@ export default function Footer() {
               Browser-based · No account required
             </p>
           </div>
-          <nav aria-label="Popular tools">
-            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Popular tools</h2>
-            <ul className="mt-3 space-y-1">
-              {popularTools.map((tool) => (
-                <li key={tool.slug}><Link to={`/${tool.slug}`} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">{tool.shortName || tool.name}</Link></li>
+          <nav aria-label="All developer tools">
+            <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Developer tools</h2>
+            <ul className="mt-3 grid gap-x-5 sm:grid-cols-2 lg:grid-cols-1">
+              {tools.map((tool) => (
+                <li key={tool.slug}><Link to={`/${tool.slug}`} data-track={`footer.tool.${tool.slug}`} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">{tool.shortName || tool.name}</Link></li>
               ))}
-              <li><Link to="/#tools" className="inline-flex min-h-9 items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">Browse all tools <span aria-hidden="true">→</span></Link></li>
+              <li><Link to="/tools" data-track="footer.link.tools" className="inline-flex min-h-9 items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">Browse by category <span aria-hidden="true">→</span></Link></li>
             </ul>
           </nav>
           <nav aria-label="Resources and company">
@@ -73,11 +71,11 @@ export default function Footer() {
           <nav aria-label="Company and legal">
             <h2 className="text-xs font-extrabold uppercase tracking-wider text-slate-900">Company & legal</h2>
             <ul className="mt-3 space-y-1">
-              <li><Link to="/#about" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">About DevTools</Link></li>
-              <li><Link to="/contact" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Contact</Link></li>
-              <li><Link to="/privacy" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Privacy policy</Link></li>
-              <li><Link to="/terms" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Terms of use</Link></li>
-              <li><button type="button" onClick={openConsentSettings} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Cookie settings</button></li>
+              <li><Link to="/about" data-track="footer.link.about" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">About DevTools</Link></li>
+              <li><Link to="/contact" data-track="footer.link.contact" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Contact</Link></li>
+              <li><Link to="/privacy" data-track="footer.link.privacy" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Privacy policy</Link></li>
+              <li><Link to="/terms" data-track="footer.link.terms" className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Terms of use</Link></li>
+              <li><button type="button" data-track="footer.cookie-settings" onClick={openConsentSettings} className="inline-flex min-h-9 items-center text-sm font-medium text-slate-600 transition hover:text-brand-600">Cookie settings</button></li>
             </ul>
           </nav>
         </div>

@@ -4,6 +4,7 @@ import Editor from "@/components/Editor"
 import { OptionToggle } from "@/components/OptionControls"
 import { useDebouncedUsage } from "@/hooks/useDebouncedUsage"
 import { runRegex, type RegexMatch, type RegexResult } from "@/lib/regexRun"
+import { traceToolRun } from "@/lib/monitoring"
 
 const SAMPLE_TEXT = "john@example.com\nhello@devtools.com\nnot-an-email\nteam@product.io"
 const FLAGS = [
@@ -34,25 +35,32 @@ export default function RegexTester() {
         if (id !== reqId.current) return
         setState(r.ok ? { running: false, matches: r.matches, truncated: r.truncated, error: null, code: "" } : { ...IDLE, error: r.error, code: r.code })
       }
-      if (typeof Worker === "undefined") return finish(runRegex(pattern, flags, text))
-
-      worker.current?.terminate() // a previous run may still be busy
-      const w = new Worker(new URL("./regexWorker.ts", import.meta.url), { type: "module" })
-      worker.current = w
-      setState((s) => ({ ...s, running: true }))
-      const guard = setTimeout(() => {
-        w.terminate()
-        if (worker.current === w) worker.current = null
-        if (id === reqId.current) setState({ ...IDLE, error: "This pattern took too long to run. It may cause catastrophic backtracking, for example nested quantifiers like (a+)+.", code: "timeout" })
-      }, TIMEOUT_MS)
-      w.onmessage = (e: MessageEvent<{ id: number; result: RegexResult }>) => {
-        clearTimeout(guard)
-        finish(e.data.result)
-      }
-      w.onerror = () => {
-        clearTimeout(guard)
-        if (id === reqId.current) setState({ ...IDLE, error: "The regex could not be evaluated.", code: "worker_error" })
-      }
+      const sizeBytes = new Blob([pattern, text]).size
+      const execution = traceToolRun("regex-tester", sizeBytes, () => {
+        if (typeof Worker === "undefined") return runRegex(pattern, flags, text)
+        worker.current?.terminate() // a previous run may still be busy
+        const w = new Worker(new URL("./regexWorker.ts", import.meta.url), { type: "module" })
+        worker.current = w
+        setState((s) => ({ ...s, running: true }))
+        return new Promise<RegexResult>((resolve, reject) => {
+          const guard = setTimeout(() => {
+            w.terminate()
+            if (worker.current === w) worker.current = null
+            if (id === reqId.current) setState({ ...IDLE, error: "This pattern took too long to run. It may cause catastrophic backtracking, for example nested quantifiers like (a+)+.", code: "timeout" })
+            reject(new Error("Regex worker timed out"))
+          }, TIMEOUT_MS)
+          w.onmessage = (e: MessageEvent<{ id: number; result: RegexResult }>) => {
+            clearTimeout(guard)
+            resolve(e.data.result)
+          }
+          w.onerror = () => {
+            clearTimeout(guard)
+            if (id === reqId.current) setState({ ...IDLE, error: "The regex could not be evaluated.", code: "worker_error" })
+            reject(new Error("Regex worker failed"))
+          }
+        })
+      })
+      void execution.then(finish, () => undefined)
     }, 250)
     return () => clearTimeout(timer)
   }, [pattern, flags, text])
@@ -77,7 +85,7 @@ export default function RegexTester() {
   }, [state.matches, text])
 
   return (
-    <div className="container-page py-8 sm:py-10">
+    <div className="container-page py-8 sm:py-10" data-track-area="tool-workspace">
       <div className="rounded-(--radius-card) border border-slate-200 bg-surface p-4 shadow-(--shadow-card) sm:p-6">
         <label htmlFor="regex-pattern" className="text-sm font-extrabold text-slate-800">Regular Expression</label>
         <div className="mt-3 flex items-center rounded-xl border border-slate-200 bg-slate-50 font-mono focus-within:border-brand-400 focus-within:ring-4 focus-within:ring-brand-50">
@@ -95,7 +103,7 @@ export default function RegexTester() {
           <span className="pr-4 text-lg font-bold text-slate-400">/{flags}</span>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          {FLAGS.map(({ f, label }) => <OptionToggle key={f} label={label} checked={flags.includes(f)} onChange={() => toggleFlag(f)} />)}
+          {FLAGS.map(({ f, label }) => <OptionToggle key={f} label={label} dataTrack={`regex.flag.${f}`} checked={flags.includes(f)} onChange={() => toggleFlag(f)} />)}
         </div>
       </div>
 
